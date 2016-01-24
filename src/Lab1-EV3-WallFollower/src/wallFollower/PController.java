@@ -4,7 +4,7 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 public class PController implements UltrasonicController {
 	
 	private final int bandCenter, bandwidth;
-	private final int motorStraight = 200, FILTER_OUT = 20;
+	private final int motorStraight = 210, FILTER_OUT = 40; //filter_out init = 20;
 	private final int PMULT = 6; //Arbitrary 'Proportion Multiplier' for error adjustment
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private int distance;
@@ -17,7 +17,7 @@ public class PController implements UltrasonicController {
 		this.bandwidth = bandwidth;
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
-		leftMotor.setSpeed(motorStraight);					// Initalize motor rolling forward
+		leftMotor.setSpeed(motorStraight);					// Initialize motor rolling forward
 		rightMotor.setSpeed(motorStraight);
 		leftMotor.forward();
 		rightMotor.forward();
@@ -44,7 +44,7 @@ public class PController implements UltrasonicController {
 		
 		// TODO: process a movement based on the us distance passed in (P style)
 		int distError=bandCenter-distance;			// Compute error
-								
+		int diff;
 		
 		if (Math.abs(distError) <= bandwidth) {	// Within limits, same speed
 			leftMotor.setSpeed(motorStraight);		// Start moving forward
@@ -53,19 +53,32 @@ public class PController implements UltrasonicController {
 			rightMotor.forward();				
 		}
 			
-		else if (distError > 0) {				// Too close to the wall
-			leftMotor.setSpeed(motorStraight);
-			rightMotor.setSpeed(motorStraight-(distError*PMULT));
+		else if (distError > 0) {	// Too close to the wall
+			diff = calcProp(distError);
+			leftMotor.setSpeed(motorStraight + diff);
+			rightMotor.setSpeed(motorStraight - diff);
 			leftMotor.forward();
-			rightMotor.forward();				
+			rightMotor.forward();		
 		}
 					
-		else if (distError < 0) {
-			leftMotor.setSpeed(motorStraight-(distError*PMULT));
-			rightMotor.setSpeed(motorStraight);
+		else if (distError < 0) { //too far
+			diff = calcProp(distError);
+			leftMotor.setSpeed(motorStraight - diff);
+			rightMotor.setSpeed(motorStraight + diff);
 			leftMotor.forward();
 			rightMotor.forward();								
 		}
+		
+		
+	}
+	
+	private int calcProp(int diff) {
+		int correction;
+		if(diff < 0) diff = -diff;
+		correction = (int)(PMULT*(double)diff);
+		if(correction > motorStraight) correction = 100; //50 is max correction
+		return correction;
+		
 	}
 
 	
