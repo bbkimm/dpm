@@ -1,4 +1,4 @@
-package wallFolllower;
+package wallFollower;
 
 public interface UltrasonicController {
 	

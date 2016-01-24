@@ -5,6 +5,7 @@ public class PController implements UltrasonicController {
 	
 	private final int bandCenter, bandwidth;
 	private final int motorStraight = 200, FILTER_OUT = 20;
+	private final int PMULT = 6; //Arbitrary 'Proportion Multiplier' for error adjustment
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
 	private int distance;
 	private int filterControl;
@@ -43,7 +44,7 @@ public class PController implements UltrasonicController {
 		
 		// TODO: process a movement based on the us distance passed in (P style)
 		int distError=bandCenter-distance;			// Compute error
-		int pMultiplier = 6;						// Arbitrary 'Proportion Multiplier' for error adjustment
+								
 		
 		if (Math.abs(distError) <= bandwidth) {	// Within limits, same speed
 			leftMotor.setSpeed(motorStraight);		// Start moving forward
@@ -54,13 +55,13 @@ public class PController implements UltrasonicController {
 			
 		else if (distError > 0) {				// Too close to the wall
 			leftMotor.setSpeed(motorStraight);
-			rightMotor.setSpeed(motorStraight-(distError*pMultiplier));
+			rightMotor.setSpeed(motorStraight-(distError*PMULT));
 			leftMotor.forward();
 			rightMotor.forward();				
 		}
 					
 		else if (distError < 0) {
-			leftMotor.setSpeed(motorStraight-(distError*pMultiplier));
+			leftMotor.setSpeed(motorStraight-(distError*PMULT));
 			rightMotor.setSpeed(motorStraight);
 			leftMotor.forward();
 			rightMotor.forward();								

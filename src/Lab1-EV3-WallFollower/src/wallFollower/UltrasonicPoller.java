@@ -1,4 +1,4 @@
-package wallFolllower;
+package wallFollower;
 import lejos.robotics.SampleProvider;
 
 //
