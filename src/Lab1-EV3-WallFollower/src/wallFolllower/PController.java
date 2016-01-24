@@ -1,4 +1,4 @@
-package wallFolllower;
+package wallFollower;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class PController implements UltrasonicController {
@@ -16,7 +16,7 @@ public class PController implements UltrasonicController {
 		this.bandwidth = bandwidth;
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
-		leftMotor.setSpeed(motorStraight);					// Initialize motor rolling forward
+		leftMotor.setSpeed(motorStraight);					// Initalize motor rolling forward
 		rightMotor.setSpeed(motorStraight);
 		leftMotor.forward();
 		rightMotor.forward();
@@ -41,7 +41,30 @@ public class PController implements UltrasonicController {
 			this.distance = distance;
 		}
 		
-		// TODO: process a movement based on the us distance passed in (P style)	
+		// TODO: process a movement based on the us distance passed in (P style)
+		int distError=bandCenter-distance;			// Compute error
+		int pMultiplier = 6;						// Arbitrary 'Proportion Multiplier' for error adjustment
+		
+		if (Math.abs(distError) <= bandwidth) {	// Within limits, same speed
+			leftMotor.setSpeed(motorStraight);		// Start moving forward
+			rightMotor.setSpeed(motorStraight);
+			leftMotor.forward();
+			rightMotor.forward();				
+		}
+			
+		else if (distError > 0) {				// Too close to the wall
+			leftMotor.setSpeed(motorStraight);
+			rightMotor.setSpeed(motorStraight-(distError*pMultiplier));
+			leftMotor.forward();
+			rightMotor.forward();				
+		}
+					
+		else if (distError < 0) {
+			leftMotor.setSpeed(motorStraight-(distError*pMultiplier));
+			rightMotor.setSpeed(motorStraight);
+			leftMotor.forward();
+			rightMotor.forward();								
+		}
 	}
 
 	

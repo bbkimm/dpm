@@ -1,4 +1,4 @@
-package wallFolllower;
+package wallFollower;
 import lejos.hardware.motor.*;
 
 public class BangBangController implements UltrasonicController{
@@ -26,6 +26,30 @@ public class BangBangController implements UltrasonicController{
 	public void processUSData(int distance) {
 		this.distance = distance;
 		// TODO: process a movement based on the us distance passed in (BANG-BANG style)
+		// Controller
+		
+		int distError=bandCenter-distance;			// Compute error
+					
+		if (Math.abs(distError) <= bandwidth) {	// Within limits, same speed
+			leftMotor.setSpeed(motorHigh);		// Start moving forward
+			rightMotor.setSpeed(motorHigh);
+			leftMotor.forward();
+			rightMotor.forward();				
+		}
+			
+		else if (distError > 0) {				// Too close to the wall
+			leftMotor.setSpeed(motorHigh);
+			rightMotor.setSpeed(motorHigh-motorLow);
+			leftMotor.forward();
+			rightMotor.forward();				
+		}
+					
+		else if (distError < 0) {
+			leftMotor.setSpeed(motorHigh-motorLow);
+			rightMotor.setSpeed(motorHigh);
+			leftMotor.forward();
+			rightMotor.forward();								
+		}	
 	}
 
 	@Override
