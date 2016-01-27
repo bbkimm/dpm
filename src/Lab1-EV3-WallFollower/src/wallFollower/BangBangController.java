@@ -10,8 +10,8 @@ public class BangBangController implements UltrasonicController{
 	public BangBangController(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor,
 							  int bandCenter, int bandwidth, int motorLow, int motorHigh) {
 		//Default Constructor
-		this.bandCenter = bandCenter-1;
-		this.bandwidth = bandwidth;
+		this.bandCenter = bandCenter-2; //account for different distances for bangbang and pcontroller
+		this.bandwidth = bandwidth; //this is the error margin we are allowing for
 		this.motorLow = motorLow;
 		this.motorHigh = motorHigh;
 		this.leftMotor = leftMotor;
@@ -29,23 +29,23 @@ public class BangBangController implements UltrasonicController{
 		int distError=bandCenter-distance;			// Compute error
 					
 		if (Math.abs(distError) <= bandwidth) {	// Within limits, same speed
-			leftMotor.setSpeed(motorHigh);		// Start moving forward
+			leftMotor.setSpeed(motorHigh);		// Start moving forward maintain same speed on each motor
 			rightMotor.setSpeed(motorHigh);
 			leftMotor.forward();
 			rightMotor.forward();				
 		}
 			
 		else if (distError > 0) {				// Too close to the wall
-			leftMotor.setSpeed(motorHigh);
-			rightMotor.setSpeed(motorLow);
-			leftMotor.forward();
+			leftMotor.setSpeed(motorHigh); //
+			rightMotor.setSpeed(motorLow); //reduction in right motor speed moves robot away from wall
+			leftMotor.forward(); //start moving
 			rightMotor.forward();				
 		}
 					
-		else if (distError < 0) { // too far
-			leftMotor.setSpeed(motorLow);
+		else if (distError < 0) { // too far from wall
+			leftMotor.setSpeed(motorLow); //reduction in left motor speed moves robot toward wall. 
 			rightMotor.setSpeed(motorHigh);
-			leftMotor.forward();
+			leftMotor.forward(); //start moving
 			rightMotor.forward();								
 		}	
 	}

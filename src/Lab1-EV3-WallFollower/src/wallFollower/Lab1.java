@@ -16,10 +16,10 @@ public class Lab1 {
 
 // Parameters: adjust these for desired performance
 
-	private static final int bandCenter = 36;			// Offset from the wall (cm)
+	private static final int bandCenter = 37;			// Offset from the wall (cm) this was determined to be the optimum value for pcontroller
 	private static final int bandWidth = 2;				// Width of dead band (cm)
-	private static final int motorLow = 70;			// Speed of slower rotating wheel (deg/sec) 75
-	private static final int motorHigh = 220;			// Speed of the faster rotating wheel (deg/sec) 275
+	private static final int motorLow = 50;			// Speed of slower rotating wheel (deg/sec) (75)
+	private static final int motorHigh = 240;			// Speed of the faster rotating wheel (deg/sec) (275) adjusted to ensure tight turning
 	
 // Static Resources:
 //

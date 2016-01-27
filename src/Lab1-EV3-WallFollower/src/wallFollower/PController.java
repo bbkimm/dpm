@@ -4,10 +4,10 @@ import lejos.hardware.motor.EV3LargeRegulatedMotor;
 public class PController implements UltrasonicController {
 	
 	private final int bandCenter, bandwidth;
-	private final int motorStraight = 210, FILTER_OUT = 40; //filter_out init = 20;
-	private final int PMULT = 6; //Arbitrary 'Proportion Multiplier' for error adjustment
+	private final int motorStraight = 210, FILTER_OUT = 20; 
+	private final int PMULT = 6; //Arbitrary 'Proportion Multiplier' for error adjustment. 
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
-	private int distance;
+	private int distance; // distance collected from sensor
 	private int filterControl;
 	
 	public PController(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor,
@@ -42,41 +42,40 @@ public class PController implements UltrasonicController {
 			this.distance = distance;
 		}
 		
-		// TODO: process a movement based on the us distance passed in (P style)
 		int distError=bandCenter-distance;			// Compute error
-		int diff;
+		int diff; //init difference var
 		
 		if (Math.abs(distError) <= bandwidth) {	// Within limits, same speed
-			leftMotor.setSpeed(motorStraight);		// Start moving forward
+			leftMotor.setSpeed(motorStraight);		// Start moving forward at regular speed
 			rightMotor.setSpeed(motorStraight);
 			leftMotor.forward();
 			rightMotor.forward();				
 		}
 			
 		else if (distError > 0) {	// Too close to the wall
-			diff = calcProp(distError);
-			leftMotor.setSpeed(motorStraight + diff);
+			diff = calcProp(distError);// calculate the diff in speed that needs to be applied
+			leftMotor.setSpeed(motorStraight + 2 * diff); //applied in the +/- directions to each wheel to ensure tight turns
 			rightMotor.setSpeed(motorStraight - diff);
 			leftMotor.forward();
-			rightMotor.forward();		
+			rightMotor.forward(); //initiate wheels turning		
 		}
 					
-		else if (distError < 0) { //too far
-			diff = calcProp(distError);
+		else if (distError < 0) { //too far from the wall
+			diff = calcProp(distError); //calculate the diff in speed that needs to be applied
 			leftMotor.setSpeed(motorStraight - diff);
-			rightMotor.setSpeed(motorStraight + diff);
+			rightMotor.setSpeed(motorStraight + diff);//applied in the +/- directions to each wheel to ensure tight turns
 			leftMotor.forward();
-			rightMotor.forward();								
+			rightMotor.forward(); //initiate wheels turning										
 		}
 		
 		
 	}
 	
-	private int calcProp(int diff) {
+	private int calcProp(int diff) { //from slides
 		int correction;
-		if(diff < 0) diff = -diff;
-		correction = (int)(PMULT*(double)diff);
-		if(correction > motorStraight) correction = 100; //50 is max correction
+		if(diff < 0) diff = -diff; //compute absolute value
+		correction = (int)(PMULT*(double)diff); //apply multiplier, ensuring proper truncating. 
+		if(correction > motorStraight) correction = 100; // updated to ensure quicker turning for large anomaly values. 
 		return correction;
 		
 	}
