@@ -4,37 +4,66 @@
 
 package ev3Odometer;
 
+import lejos.hardware.Button;
+import lejos.hardware.motor.EV3LargeRegulatedMotor;
+
 public class Odometer extends Thread {
 	// robot position
-	private double x, y, theta;
+	private double x, y, theta, WR, TR;
 
 	// odometer update period, in ms
 	private static final long ODOMETER_PERIOD = 25;
+	
+	private int prevTachoL, prevTachoR, tachoL, tachoR, distL, distR;
 
 	// lock object for mutual exclusion
 	private Object lock;
 
+
+	private static EV3LargeRegulatedMotor leftMotor, rightMotor;
+	
 	// default constructor
-	public Odometer() {
+	public Odometer(EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, double WR, double TR) {
 		x = 0.0;
 		y = 0.0;
 		theta = 0.0;
+		this.leftMotor = leftMotor;
+		this.rightMotor = rightMotor;
+		this.WR = WR;
+		this.TR = TR;
 		lock = new Object();
 	}
+
 
 	// run method (required for Thread)
 	public void run() {
 		long updateStart, updateEnd;
-
+		
+		
 		while (true) {
 			updateStart = System.currentTimeMillis();
-			// put (some of) your odometer code here
-
+			double distL, distR, deltaD, deltaT, dX, dY;
+			
+			tachoL = leftMotor.getTachoCount(); //get values from the motors
+			tachoR = rightMotor.getTachoCount();
+			distL = (Math.PI*WR*(tachoL-prevTachoL))/180;		// compute L and R wheel displacements
+			distR = (Math.PI*WR*(tachoR-prevTachoR))/180;
+			prevTachoL=tachoL;								// save tacho counts for next iteration
+			prevTachoR=tachoR;
+			deltaD = 0.5*(distL+distR);							// compute vehicle displacement
+			deltaT = (180*((distL-distR)/TR))/Math.PI;							// compute change in heading									// update heading
+		    dX = deltaD * Math.sin(theta);						// compute X component of displacement
+			dY = deltaD * Math.cos(theta);						// compute Y component of displacement
+			
+			
 			synchronized (lock) {
 				// don't use the variables x, y, or theta anywhere but here!
-				theta = -0.7376;
+				x = x + dX;											// update estimates of X and Y position
+				y = y + dY;	
+				theta += deltaT;
+				
 			}
-
+			
 			// this ensures that the odometer only runs once every period
 			updateEnd = System.currentTimeMillis();
 			if (updateEnd - updateStart < ODOMETER_PERIOD) {
