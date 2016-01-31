@@ -8,6 +8,7 @@ import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.MotorPort;
 import lejos.hardware.port.Port;
+import lejos.hardware.sensor.EV3ColorSensor;
 
 public class Lab2 {
 	
@@ -32,6 +33,7 @@ public class Lab2 {
 		OdometryCorrection odometryCorrection = new OdometryCorrection(odometer);
 
 		do {
+			EV3ColorSensor colorSensor = new EV3ColorSensor(LocalEV3.get().getPort("S1"));
 			// clear the display
 			t.clear();
 

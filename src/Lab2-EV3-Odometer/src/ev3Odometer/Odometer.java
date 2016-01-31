@@ -4,8 +4,11 @@
 
 package ev3Odometer;
 
+import javax.swing.colorchooser.ColorSelectionModel;
+
 import lejos.hardware.Button;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.sensor.EV3ColorSensor;
 
 public class Odometer extends Thread {
 	// robot position
@@ -18,7 +21,6 @@ public class Odometer extends Thread {
 
 	// lock object for mutual exclusion
 	private Object lock;
-
 
 	private static EV3LargeRegulatedMotor leftMotor, rightMotor;
 	
@@ -52,15 +54,17 @@ public class Odometer extends Thread {
 			prevTachoR=tachoR;
 			deltaD = 0.5*(distL+distR);							// compute vehicle displacement
 			deltaT = (180*((distL-distR)/TR))/Math.PI;							// compute change in heading									// update heading
-		    dX = deltaD * Math.sin(theta);						// compute X component of displacement
-			dY = deltaD * Math.cos(theta);						// compute Y component of displacement
+		   
 			
 			
 			synchronized (lock) {
 				// don't use the variables x, y, or theta anywhere but here!
+				theta += deltaT;
+				dX = deltaD * Math.sin((Math.PI*theta)/180);						// compute X component of displacement
+				dY = deltaD * Math.cos((Math.PI*theta)/180);						// compute Y component of displacement
 				x = x + dX;											// update estimates of X and Y position
 				y = y + dY;	
-				theta += deltaT;
+				
 				
 			}
 			
