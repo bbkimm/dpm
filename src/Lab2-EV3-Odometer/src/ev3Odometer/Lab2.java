@@ -15,13 +15,15 @@ public class Lab2 {
 	// Static Resources:
 	// Left motor connected to output A
 	// Right motor connected to output D
+	// colorSensor connected to S1 port
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-
+	private static final EV3ColorSensor colorSensor = new EV3ColorSensor(LocalEV3.get().getPort("S1"));
 	// Constants
 	public static final double WHEEL_RADIUS = 2.1;
 	public static final double TRACK = 15.8;
-
+	
+	
 	public static void main(String[] args) {
 		int buttonChoice;
 
@@ -30,10 +32,11 @@ public class Lab2 {
 		final TextLCD t = LocalEV3.get().getTextLCD();
 		Odometer odometer = new Odometer(leftMotor, rightMotor, WHEEL_RADIUS, TRACK);
 		OdometryDisplay odometryDisplay = new OdometryDisplay(odometer,t);
-		OdometryCorrection odometryCorrection = new OdometryCorrection(odometer);
+		OdometryCorrection odometryCorrection = new OdometryCorrection(odometer, colorSensor);
+		
 
 		do {
-			EV3ColorSensor colorSensor = new EV3ColorSensor(LocalEV3.get().getPort("S1"));
+			
 			// clear the display
 			t.clear();
 
@@ -64,7 +67,7 @@ public class Lab2 {
 			
 			odometer.start();
 			odometryDisplay.start();
-			//odometryCorrection.start();
+			odometryCorrection.start();
 
 			// spawn a new Thread to avoid SquareDriver.drive() from blocking
 			(new Thread() {
