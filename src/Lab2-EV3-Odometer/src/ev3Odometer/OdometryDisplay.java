@@ -35,7 +35,9 @@ public class OdometryDisplay extends Thread {
 
 			// get the odometry information
 			odometer.getPosition(position, new boolean[] { true, true, true });
-
+			if(position[2] < 0) position[2] = 360 + position[2]; // is negative
+			else if(position[2] > 360) position[2] = 0 + Math.abs(position[2] - 360);  //is positive 
+			
 			// display odometry information
 			for (int i = 0; i < 3; i++) {
 				t.drawString(formattedDoubleToString(position[i], 2), 3, i);

@@ -59,6 +59,7 @@ public class Odometer extends Thread {
 			
 			synchronized (lock) {
 				// don't use the variables x, y, or theta anywhere but here!
+				
 				theta += deltaT;
 				dX = deltaD * Math.sin((Math.PI*theta)/180);						// compute X component of displacement
 				dY = deltaD * Math.cos((Math.PI*theta)/180);						// compute Y component of displacement
