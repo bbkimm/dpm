@@ -73,7 +73,7 @@ public class Lab2 {
 			(new Thread() {
 				public void run() {
 					SquareDriver.drive(leftMotor, rightMotor, WHEEL_RADIUS, WHEEL_RADIUS, TRACK);
-				}
+				}	
 			}).start();
 		}
 		
