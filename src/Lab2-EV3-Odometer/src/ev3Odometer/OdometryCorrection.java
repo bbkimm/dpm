@@ -1,5 +1,6 @@
 /* 
  * OdometryCorrection.java
+
  * Group 51
  * Brian Kim - Lim 260636766
  * Jason Dias 260617554
@@ -54,35 +55,60 @@ public class OdometryCorrection extends Thread {
 				else if(currentPosition[1] <= 50 && currentPosition[1] >= 40 && // line 2
 						currentPosition[0] <= 5 && currentPosition[0] >= -5) {
 					odometer.setX(0);
+<<<<<<< HEAD
+=======
+					odometer.setY(45);
+>>>>>>> 40d2a70848e550c0a6022e7ff38986ec389bf557
 					odometer.setTheta(0);
 					
 					
 				}
 				else if(currentPosition[1] <= 65 && currentPosition[1] >= 55 && // line 3
 						currentPosition[0] <= 20 && currentPosition[0] >= 10) {
+<<<<<<< HEAD
 					odometer.setX(15.5);
+=======
+					odometer.setX(15);
+					odometer.setY(60);
+>>>>>>> 40d2a70848e550c0a6022e7ff38986ec389bf557
 					odometer.setTheta(90);
 				
 				}
 				else if(currentPosition[1] <= 65 && currentPosition[1] >= 55 && //line 4
 						currentPosition[0] <= 50 && currentPosition[0] >= 40) {
+<<<<<<< HEAD
+=======
+					odometer.setX(45);
+					odometer.setY(60);
+>>>>>>> 40d2a70848e550c0a6022e7ff38986ec389bf557
 					odometer.setTheta(90);
 					
 				}
 				else if(currentPosition[1] <= 50 && currentPosition[1] >= 40 && //line 5
 						currentPosition[0] <= 65 && currentPosition[0] >= 55) {
+<<<<<<< HEAD
+=======
+					odometer.setX(60);
+					odometer.setY(45);
+>>>>>>> 40d2a70848e550c0a6022e7ff38986ec389bf557
 					odometer.setTheta(180);
 				
 					
 				}
 				else if(currentPosition[1] <= 20 && currentPosition[1] >= 10 && //line 6
 						currentPosition[0] <= 65 && currentPosition[0] >= 55) {
+<<<<<<< HEAD
 					odometer.setY(14);
+=======
+					odometer.setX(60);
+					odometer.setY(15);
+>>>>>>> 40d2a70848e550c0a6022e7ff38986ec389bf557
 					odometer.setTheta(180);
 					
 				}
 				else if(currentPosition[1] <= 5 && currentPosition[1] >= -5 && //line 7
 						currentPosition[0] <= 50 && currentPosition[0] >= 40) {
+<<<<<<< HEAD
 					odometer.setTheta(270);
 					
 				}
@@ -93,6 +119,20 @@ public class OdometryCorrection extends Thread {
 					
 				}
 
+=======
+					odometer.setX(45);
+					odometer.setY(0);
+					odometer.setTheta(270);
+					
+				}
+				else if(currentPosition[1] <= 5 && currentPosition[1] >= -5 && //line 7
+						currentPosition[0] <= 20 && currentPosition[0] >= 10) {
+					odometer.setX(13);
+					odometer.setY(0);
+					odometer.setTheta(270);
+					
+				}
+>>>>>>> 40d2a70848e550c0a6022e7ff38986ec389bf557
 				
 			
 				
