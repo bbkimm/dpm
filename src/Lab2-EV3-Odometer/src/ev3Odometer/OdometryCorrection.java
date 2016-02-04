@@ -62,7 +62,7 @@ public class OdometryCorrection extends Thread {
 				}
 				else if(currentPosition[1] <= 65 && currentPosition[1] >= 55 && // line 3
 						currentPosition[0] <= 20 && currentPosition[0] >= 10) {
-					odometer.setX(15.5);
+					odometer.setX(15.5);	
 					odometer.setY(60);
 					odometer.setTheta(90);
 				
