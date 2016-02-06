@@ -4,7 +4,8 @@ import lejos.hardware.*;
 
 public class HelloWorld {
 	public static void main(String[] args) {
-		System.out.println("Hello World");
+		double x = Math.atan2(, 90);
+		System.out.println(x);
 		Button.waitForAnyPress();
 	}
 }
