@@ -1,13 +1,6 @@
 package navigation;
 
-import javax.swing.plaf.synth.SynthSeparatorUI;
-
-import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
-import lejos.hardware.sensor.EV3UltrasonicSensor;
-import lejos.hardware.sensor.SensorModes;
-import lejos.hardware.sensor.NXTUltrasonicSensor.DistanceMode;
-import lejos.robotics.SampleProvider;
 
 public class Navigation extends Thread {
 
@@ -52,22 +45,24 @@ public class Navigation extends Thread {
 	}
 
 	public void run() {
-		 if (avoidance){
-			 travelTo(0,60);
-			 travelTo(60,0);
-		 }
-		 else{
-			 travelTo(60,30);
-			 travelTo(30,30);
-			 travelTo(30,60);
-			 travelTo(60,0);
-		 }
-		 this.done = true;
+		// determine which path
+		if (avoidance) {
+			travelTo(0, 60);
+			travelTo(60, 0);
+		} else {
+			travelTo(60, 30);
+			travelTo(30, 30);
+			travelTo(30, 60);
+			travelTo(60, 0);
+		}
+		this.done = true;
 	}
 
 	private static void travelTo(double xDest, double yDest) {
-		// get offset between current location and destination
+		
+
 		while (!completed) {
+			// get offset between current location and destination
 			double x = xDest - odometer.getX();
 			double y = yDest - odometer.getY();
 
@@ -79,7 +74,6 @@ public class Navigation extends Thread {
 			rightMotor.setSpeed(ROTATE_SPEED);
 
 			// turn to before beginning traversal
-			System.out.println("\n\n\n\n\n" + "requiredOrientation: " + requiredOrientation);
 			turnTo(requiredOrientation); // with respect to y axis
 
 			// calculate required distance
@@ -89,38 +83,22 @@ public class Navigation extends Thread {
 			rightMotor.setSpeed(FWD_SPEED);
 			navigating = true;
 
-			if (avoidance == true) {
+			if (avoidance) { // path B
 				leftMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistace), true);
 				rightMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistace), true);
 
 				while (leftMotor.isMoving() || rightMotor.isMoving()) {
-					// if obstacle detected within threshold
-					double threshold = 30;
-					if (distance < threshold) {
-						// stop motors
+
+					double threshold = 40;
+					//System.out.println("\n\n\n\n\n\n\n" + distance);
+					if (distance < threshold) { // check if distance from US is
+												// less than threshold distance
 						leftMotor.stop();
 						rightMotor.stop();
 
-						// rotate 90 degrees to the right
-						leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, 90), true);
-						rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, 90), false);
-
-						// move forward for a short while
-						leftMotor.rotate(convertDistance(WHEEL_RADIUS, 35), true);
-						rightMotor.rotate(convertDistance(WHEEL_RADIUS, 35), true);
-
-						// wait until movement of motors is over
-						while (leftMotor.isMoving() || rightMotor.isMoving())
-							// check whether this sudden movement got you close
-							// to
-							// the destination, if so break and try again
-							if (Math.abs(xDest - odometer.getX()) <= 10 && Math.abs(yDest - odometer.getY()) <= 10)
-								break;
-
-						// break from loop and recalculate everything based on
-						// new
-						// current location
-						break;
+						// use P controller
+						avoidance((int) (threshold - distance));
+						break; // break out to recalculate
 					}
 					// set done and return from function if and only if we are
 					// within +/- (1,1) of the desired destination
@@ -128,23 +106,55 @@ public class Navigation extends Thread {
 					else if (Math.abs(xDest - odometer.getX()) <= 1 && Math.abs(yDest - odometer.getY()) <= 1) {
 						completed = true;
 					}
-
 				}
-
 			}
-			
+
 			else {
 				leftMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistace), true);
 				rightMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistace), false);
 				completed = true;
 			}
+
 		}
-		
+
 		completed = false;
 		// stop motors
 		leftMotor.stop();
 		rightMotor.stop();
-		System.out.println("Hello!");
+
+	}
+
+	// avoidance method taken from P-Controller
+	private static void avoidance(int distError) {
+		int diff = calcProp(distError);	
+		leftMotor.setSpeed(FWD_SPEED - diff); 
+		rightMotor.setSpeed(FWD_SPEED + diff);
+		
+		while (distance < 40.0) {
+			leftMotor.forward();				 
+			rightMotor.forward();
+		}
+		
+		leftMotor.setSpeed(FWD_SPEED);
+		rightMotor.setSpeed(FWD_SPEED);
+		
+		leftMotor.rotate((int) ((180.0 * 25) / (Math.PI * WHEEL_RADIUS)), true);
+		rightMotor.rotate((int) ((180.0 * 25) / (Math.PI * WHEEL_RADIUS)), false);
+		
+		
+
+	}
+
+	private static int calcProp(int diff) { // from slides
+		int correction;
+		if (diff < 0)
+			diff = -diff; // compute absolute value
+		correction = (int) (10 * (double) diff); // apply multiplier, ensuring
+												// proper truncating.
+		if (correction > FWD_SPEED)
+			correction = 100; // updated to ensure quicker turning for large
+								// anomaly values.
+		return correction;
 
 	}
 

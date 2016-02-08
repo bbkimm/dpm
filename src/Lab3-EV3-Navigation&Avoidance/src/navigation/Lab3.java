@@ -60,15 +60,16 @@ public class Lab3 {
 
 		if (buttonChoice == Button.ID_LEFT) { //pathOne
 			navigation = new Navigation(odometer, leftMotor, rightMotor, pathOne, TRACK, WHEEL_RADIUS, false);
-			usPoller = new UltrasonicPoller(usDistance, usData, navigation);
 			
 		}	
 
 		else { //pathTwo
 			navigation = new Navigation(odometer, leftMotor, rightMotor, pathTwo, TRACK, WHEEL_RADIUS, true);
+			usPoller = new UltrasonicPoller(usDistance, usData, navigation);
 		}
 		
 		navigation.start();
+		usPoller.start();
 		
 
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
