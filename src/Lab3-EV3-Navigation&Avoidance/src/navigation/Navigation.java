@@ -3,6 +3,7 @@ package navigation;
 import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
+import lejos.hardware.motor.EV3MediumRegulatedMotor;
 
 public class Navigation extends Thread {
 
@@ -15,7 +16,7 @@ public class Navigation extends Thread {
 	private static Odometer odometer;
 	private static EV3LargeRegulatedMotor leftMotor;
 	private static EV3LargeRegulatedMotor rightMotor;
-	private static final EV3LargeRegulatedMotor usMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
+	private static final EV3MediumRegulatedMotor usMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("C"));
 
 	private static boolean navigating = false, completed = false, turning = false, avoidance, avoid2 = false;
 	private static double path[][];
@@ -42,8 +43,8 @@ public class Navigation extends Thread {
 
 		leftMotor.setAcceleration(2200);
 		rightMotor.setAcceleration(2200);
-
-		// instantiate
+		 
+		
 
 	}
 
@@ -94,13 +95,14 @@ public class Navigation extends Thread {
 
 				while (leftMotor.isMoving() || rightMotor.isMoving()) {
 
-					double threshold = 40;
+					double threshold = 20;
+					
 					//System.out.println("\n\n\n\n\n\n\n" + distance);
 					if (distance < threshold) { // check if distance from US is
 												// less than threshold distance
-						leftMotor.stop();
-						rightMotor.stop();
-
+						//make sharp left turn
+						leftMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(70)), true);
+						rightMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(70)), false);
 						// use P controller
 						avoidance((int) (threshold - distance));
 						break; // break out to recalculate
@@ -196,20 +198,44 @@ public class Navigation extends Thread {
 	
 	// avoidance method taken from P-Controller
 	private static void avoidance(int distError) {
+		
 		int diff = calcProp(distError);	
 		leftMotor.setSpeed(FWD_SPEED - diff); 
 		rightMotor.setSpeed(FWD_SPEED + diff);
 		
-		while (distance < 40.0) {
+		while (distance < 20.0) { //move away from the wall!
 			leftMotor.forward();				 
 			rightMotor.forward();
 		}
 		
+		leftMotor.stop();
+		rightMotor.stop();
 		leftMotor.setSpeed(FWD_SPEED);
 		rightMotor.setSpeed(FWD_SPEED);
+		usMotor.rotate(-90, false);
+		usMotor.stop();
+		usMotor.flt();
+		while(distance <= 20){
+			leftMotor.forward();
+			rightMotor.forward();
+		}
+		leftMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), true);
+		rightMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), false);
+		//block has been passed
+		leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(70)), true);
+		rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(70)), false);
 		
-		leftMotor.rotate((int) ((180.0 * 25) / (Math.PI * WHEEL_RADIUS)), true);
-		rightMotor.rotate((int) ((180.0 * 25) / (Math.PI * WHEEL_RADIUS)), false);
+		while(distance <= 10){
+			leftMotor.forward();
+			rightMotor.forward();
+		}
+		
+		usMotor.rotate(90);
+		usMotor.stop();
+		usMotor.flt();
+		
+		leftMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), true);
+		rightMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), false);
 	}
 
 	private static int calcProp(int diff) { // from slides
