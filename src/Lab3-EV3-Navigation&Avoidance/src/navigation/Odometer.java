@@ -1,5 +1,10 @@
 /*
  * Odometer.java
+ * 
+ * Group 51
+ * Brian Kim-Lim (260636766)
+ * Jason Dias (260617554)
+ *
  */
 
 package navigation;

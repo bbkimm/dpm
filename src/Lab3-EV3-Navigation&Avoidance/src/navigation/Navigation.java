@@ -1,3 +1,9 @@
+/*
+ * Group 51
+ * Brian Kim-Lim (260636766)
+ * Jason Dias (260617554)
+ */
+
 package navigation;
 
 import lejos.hardware.ev3.LocalEV3;
@@ -10,7 +16,7 @@ public class Navigation extends Thread {
 	private static int distance;
 
 	// static variables
-	private static final int FWD_SPEED = 250;
+	private static final int FWD_SPEED = 210;
 	private static final int ROTATE_SPEED = 150;
 
 	private static Odometer odometer;
@@ -18,7 +24,7 @@ public class Navigation extends Thread {
 	private static EV3LargeRegulatedMotor rightMotor;
 	private static final EV3MediumRegulatedMotor usMotor = new EV3MediumRegulatedMotor(LocalEV3.get().getPort("C"));
 
-	private static boolean navigating = false, completed = false, turning = false, avoidance, avoid2 = false;
+	private static boolean navigating = false, completed = false, turning = false, avoidance;
 	private static double path[][];
 
 	private static double TRACK;
@@ -47,10 +53,12 @@ public class Navigation extends Thread {
 	}
 
 	public void run() {
-		// determine which path
+		// Determine which path to take:
+		//Path 2
 		if (avoidance) {
 			travelTo(0, 60);
 			travelTo(60, 0);
+		//Path 1
 		} else {
 			travelTo(60, 30);
 			travelTo(30, 30);
@@ -74,27 +82,25 @@ public class Navigation extends Thread {
 			leftMotor.setSpeed(ROTATE_SPEED);
 			rightMotor.setSpeed(ROTATE_SPEED);
 
-			// turn to before beginning traversal
+			// turnTo before beginning traversal
 			turnTo(requiredOrientation); // with respect to y axis
 
-			// calculate required distance
+			// calculate required distance for straight travel
 			double desiredDistance = Math.sqrt(x * x + y * y);
 
 			leftMotor.setSpeed(FWD_SPEED);
 			rightMotor.setSpeed(FWD_SPEED);
 			navigating = true;
 
-			// path B
+			// Path 2
 			if (avoidance) {
-				// if(avoid2){
 				leftMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), true);
 				rightMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), true);
 
 				while (leftMotor.isMoving() || rightMotor.isMoving()) {
 
-					double threshold = 18;
+					double threshold = 13;
 
-					// System.out.println("\n\n\n\n\n\n\n" + distance);
 					if (distance < threshold) { // check if distance from US is
 												// less than threshold distance
 						// make sharp left turn
@@ -114,11 +120,15 @@ public class Navigation extends Thread {
 					}
 				}
 			}
-		}
-		
+			// Path 1
+			else {
+				leftMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), true);
+				rightMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), false);
+				completed = true;
+			}
+		}	
 		completed = false;
 		navigating = false;
-		// stop motors
 		leftMotor.stop();
 		rightMotor.stop();
 	}
@@ -130,38 +140,40 @@ public class Navigation extends Thread {
 		leftMotor.setSpeed(FWD_SPEED - diff);
 		rightMotor.setSpeed(FWD_SPEED + diff);
 
-		while (distance < 18.0) { // move away from the wall!
-			leftMotor.forward();
-			rightMotor.forward();
-		}
-
 		leftMotor.stop();
 		rightMotor.stop();
 		leftMotor.setSpeed(FWD_SPEED);
 		rightMotor.setSpeed(FWD_SPEED);
 		usMotor.setSpeed(ROTATE_SPEED);
+		
+		//rotate Ultrasonic Sensor motor to face the wall
 		usMotor.rotate(-85, false);
 		usMotor.stop();
 		usMotor.flt();
-		while (distance <= 18) {
-			leftMotor.forward();
-			rightMotor.forward();
-		}
-		// robot goes forward a bit more once US doesn't detect a block
-		leftMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), true);
-		rightMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), false);
-		// block has been passed
-		leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(90)), true);
-		rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(90)), false);
-
-		while (distance <= 18) {
-			leftMotor.forward();
-			rightMotor.forward();
-		}
-		// robot goes forward a bit more once US doesn't detect a block
-		leftMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), true);
-		rightMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), false);
 		
+		while (distance <= 18) {
+			leftMotor.forward();
+			rightMotor.forward();
+		}
+		// robot goes forward a bit more once US doesn't detect a block
+		leftMotor.rotate((int) ((180.0 * 15) / (Math.PI * WHEEL_RADIUS)), true);
+		rightMotor.rotate((int) ((180.0 * 15) / (Math.PI * WHEEL_RADIUS)), false);
+		// block has been passed
+		leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(88)), true);
+		rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(88)), false);
+		
+		while (distance <= 18) {
+			leftMotor.forward();
+			rightMotor.forward();
+		}
+		
+		// robot goes forward a bit more once US doesn't detect a block
+		leftMotor.rotate((int) ((180.0 * 24) / (Math.PI * WHEEL_RADIUS)), true);
+		rightMotor.rotate((int) ((180.0 * 24) / (Math.PI * WHEEL_RADIUS)), false);
+		
+		usMotor.rotate(85, false);
+		usMotor.stop();
+		usMotor.flt();		
 		
 	}
 
@@ -177,35 +189,27 @@ public class Navigation extends Thread {
 		return correction;
 	}
 
-	// used to correct orientation
+	// turnTo is used to correct orientation
 	private static void turnTo(double desiredOrientation) {
 		navigating = true;
 		double desiredDegrees = (desiredOrientation * 180) / Math.PI;
 		double currentOrientation = (odometer.getTheta());
-		if (desiredDegrees - currentOrientation < 0) {
-			double theta = desiredDegrees - currentOrientation;
-			System.out.println(theta);
-			if (Math.abs(theta) < 180) {
-				// left turn required
-				leftMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), true);
-				rightMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), false);
-			} else {
-				// right turn required
-				leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), true);
-				rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), false);
-			}
-		} else {
-			double theta = desiredDegrees - currentOrientation;
-			if (theta < 180) {
-				// right turn required
-				leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), true);
-				rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), false);
-			} else {
-				// left turn required
-				leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, 360 - theta), true);
-				rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, 360 - theta), false);
-
-			}
+		double theta = desiredDegrees - currentOrientation;
+		
+		if (theta < -180) {
+			//rotate clockwise by (theta+360) rather than counter-clockwise
+			leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, (theta+360)), true);
+			rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, (theta+360)), false);
+		} 
+		else if (theta > 180) {
+			//rotate counter-clockwise by (theta-360) rather than clockwise
+			leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, (theta-360)), true);
+			rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, (theta-360)), false);
+		}
+		else{
+			//theta is already within minimal angle range (-180,180)
+			leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, (theta)), true);
+			rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, (theta)), false);
 		}
 		navigating = false;
 	}

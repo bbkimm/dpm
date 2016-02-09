@@ -1,3 +1,9 @@
+/*
+ * Group 51
+ * Brian Kim-Lim (260636766)
+ * Jason Dias (260617554)
+ */
+
 package navigation;
 
 import org.freedesktop.DBus.Local;
@@ -16,7 +22,6 @@ public class Lab3 {
 	// instantiate static resources
 	private static final EV3LargeRegulatedMotor leftMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("A"));
 	private static final EV3LargeRegulatedMotor rightMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("D"));
-	//private static final EV3UltrasonicSensor uSensor = new EV3UltrasonicSensor(LocalEV3.get().getPort("S1"));
 	private static Odometer odometer;
 	private static Navigation navigation;
 	private static final double pathOne[][] = {{60,30},{30,30},{30,60},{60,60}};
@@ -26,6 +31,7 @@ public class Lab3 {
 	private static SensorModes usSensor = new EV3UltrasonicSensor(LocalEV3.get().getPort("S1"));		// usSensor is the instance
 	private static SampleProvider usDistance = usSensor.getMode("Distance");	// usDistance provides samples from this instance
 	private static float[] usData = new float[usDistance.sampleSize()];
+	
 	// final variables
 	public static final double TRACK = 15.8;
 	public static final double WHEEL_RADIUS = 2.1;
@@ -45,7 +51,7 @@ public class Lab3 {
 			// clear the display
 			textLCD.clear();
 
-			// ask the user whether the motors should drive in a square or float
+			// ask the user whether the robot should take Path 1 (4 way points) or Path 2 (block avoidance)
 			textLCD.drawString("< Left | Right >", 0, 0);
 			textLCD.drawString("       |        ", 0, 1);
 			textLCD.drawString("PathOne| PathTwo", 0, 2);
