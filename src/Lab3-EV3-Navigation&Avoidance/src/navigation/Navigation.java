@@ -101,6 +101,8 @@ public class Navigation extends Thread {
 					if (distance < threshold) { // check if distance from US is
 												// less than threshold distance
 						//make sharp left turn
+						leftMotor.setSpeed(ROTATE_SPEED);
+						rightMotor.setSpeed(ROTATE_SPEED);
 						leftMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(70)), true);
 						rightMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(70)), false);
 						// use P controller
@@ -153,12 +155,14 @@ public class Navigation extends Thread {
 			}
 		}
 		completed = false;
+		navigating = false;
 		// stop motors
 		leftMotor.stop();
 		rightMotor.stop();
 	}
 	
-	// Simpler hard coded avoidance alternative with less dynamic approach (such as using P-Controller)
+	// Simpler hard-coded avoidance alternative with less dynamic approach (such as using P-Controller)
+	// ** Not being used for the lab demo. This alternative is here for testing purposes **
 	// Note: US Sensor is placed on the right side of the robot
 	private static void avoidAlt(){
 		Sound.beep();
@@ -186,7 +190,7 @@ public class Navigation extends Thread {
 			turnBy(-70);
 		}
 	}
-	// rotate by a set angle in degrees, used for avoidAlt
+	// rotate robot by a set angle in degrees, used for avoidAlt
 	private static void turnBy (double angle){
 		leftMotor.setSpeed(ROTATE_SPEED);
 		rightMotor.setSpeed(ROTATE_SPEED);
@@ -203,7 +207,7 @@ public class Navigation extends Thread {
 		leftMotor.setSpeed(FWD_SPEED - diff); 
 		rightMotor.setSpeed(FWD_SPEED + diff);
 		
-		while (distance < 20.0) { //move away from the wall!
+		while (distance < 18.0) { //move away from the wall!
 			leftMotor.forward();				 
 			rightMotor.forward();
 		}
@@ -212,13 +216,15 @@ public class Navigation extends Thread {
 		rightMotor.stop();
 		leftMotor.setSpeed(FWD_SPEED);
 		rightMotor.setSpeed(FWD_SPEED);
-		usMotor.rotate(-90, false);
+		usMotor.setSpeed(ROTATE_SPEED);
+		usMotor.rotate(-85, false);
 		usMotor.stop();
 		usMotor.flt();
-		while(distance <= 20){
+		while(distance <= 18){
 			leftMotor.forward();
 			rightMotor.forward();
 		}
+		// robot goes forward a bit more once US doesn't detect a block
 		leftMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), true);
 		rightMotor.rotate((int) ((180.0 * 20) / (Math.PI * WHEEL_RADIUS)), false);
 		//block has been passed
@@ -230,7 +236,7 @@ public class Navigation extends Thread {
 			rightMotor.forward();
 		}
 		
-		usMotor.rotate(90);
+		usMotor.rotate(85, false);
 		usMotor.stop();
 		usMotor.flt();
 		
@@ -252,6 +258,7 @@ public class Navigation extends Thread {
 
 	// used to correct orientation
 	private static void turnTo(double desiredOrientation) {
+		navigating = true;
 		double desiredDegrees = (desiredOrientation * 180) / Math.PI;
 		double currentOrientation = (odometer.getTheta());
 		if (desiredDegrees - currentOrientation < 0) {
@@ -261,12 +268,14 @@ public class Navigation extends Thread {
 				// left turn required
 				leftMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), true);
 				rightMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), false);
-			} else {
+			} 
+			else {
 				// right turn required
 				leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), true);
 				rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(theta)), false);
 			}
-		} else {
+		} 
+		else {
 			double theta = desiredDegrees - currentOrientation;
 			if (theta < 180) {
 				// right turn required
@@ -278,9 +287,8 @@ public class Navigation extends Thread {
 				rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, 360 - theta), false);
 
 			}
-
 		}
-
+		navigating = false;
 	}
 
 	private static boolean isNavigating() {
