@@ -1,5 +1,6 @@
 package navigation;
 
+import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Navigation extends Thread {
@@ -13,6 +14,7 @@ public class Navigation extends Thread {
 	private static Odometer odometer;
 	private static EV3LargeRegulatedMotor leftMotor;
 	private static EV3LargeRegulatedMotor rightMotor;
+	private static final EV3LargeRegulatedMotor usMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
 
 	private static boolean navigating = false, completed = false, turning = false, avoidance;
 	private static double path[][];
