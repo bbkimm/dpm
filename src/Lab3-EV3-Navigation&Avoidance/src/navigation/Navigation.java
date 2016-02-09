@@ -1,6 +1,7 @@
 package navigation;
 
 import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Navigation extends Thread {
@@ -16,7 +17,7 @@ public class Navigation extends Thread {
 	private static EV3LargeRegulatedMotor rightMotor;
 	private static final EV3LargeRegulatedMotor usMotor = new EV3LargeRegulatedMotor(LocalEV3.get().getPort("C"));
 
-	private static boolean navigating = false, completed = false, turning = false, avoidance;
+	private static boolean navigating = false, completed = false, turning = false, avoidance, avoid2 = false;
 	private static double path[][];
 
 	private static double TRACK;
@@ -39,8 +40,8 @@ public class Navigation extends Thread {
 		leftMotor.stop();
 		rightMotor.stop();
 
-		leftMotor.setAcceleration(3000);
-		rightMotor.setAcceleration(3000);
+		leftMotor.setAcceleration(2200);
+		rightMotor.setAcceleration(2200);
 
 		// instantiate
 
@@ -79,15 +80,17 @@ public class Navigation extends Thread {
 			turnTo(requiredOrientation); // with respect to y axis
 
 			// calculate required distance
-			double desiredDistace = Math.sqrt(x * x + y * y);
+			double desiredDistance = Math.sqrt(x * x + y * y);
 
 			leftMotor.setSpeed(FWD_SPEED);
 			rightMotor.setSpeed(FWD_SPEED);
 			navigating = true;
-
-			if (avoidance) { // path B
-				leftMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistace), true);
-				rightMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistace), true);
+			
+			// path B
+			if (avoidance) { 
+			//if(avoid2){
+				leftMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), true);
+				rightMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), true);
 
 				while (leftMotor.isMoving() || rightMotor.isMoving()) {
 
@@ -110,22 +113,87 @@ public class Navigation extends Thread {
 					}
 				}
 			}
-
+			
+			//Alternative Path B
+			else if(avoid2){
+			//else if(avoidance){
+				/*Sound.beep();
+				Sound.beep();*/
+				leftMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), true);
+				rightMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), false);
+				double threshold = 10;
+				//store x and y destination coordinates of the current travelTo call for a later recursive call
+				double xDestTemp = xDest;
+				double yDestTemp = yDest;
+				
+				while (leftMotor.isMoving() || rightMotor.isMoving()) {	
+				//while(true){
+					if(distance < threshold){
+						leftMotor.stop();
+						rightMotor.stop();
+						
+						avoidAlt();
+						break;
+					}
+					// set done and return from function if and only if we are
+					// within +/- (1,1) of the desired destination
+					// otherwise keep going until motors stop and repeat
+					else if (Math.abs(xDest - odometer.getX()) <= 1 && Math.abs(yDest - odometer.getY()) <= 1) {
+						completed = true;
+					}
+				}
+			}
+			
 			else {
-				leftMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistace), true);
-				rightMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistace), false);
+				leftMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), true);
+				rightMotor.rotate(convertDistance(WHEEL_RADIUS, desiredDistance), false);
 				completed = true;
 			}
-
 		}
-
 		completed = false;
 		// stop motors
 		leftMotor.stop();
 		rightMotor.stop();
-
 	}
-
+	
+	// Simpler hard coded avoidance alternative with less dynamic approach (such as using P-Controller)
+	// Note: US Sensor is placed on the right side of the robot
+	private static void avoidAlt(){
+		Sound.beep();
+		double threshold = 10;
+		
+		//turn left by x degrees
+		turnBy(-70);
+		//go forward by set distance
+		leftMotor.rotate(convertDistance(WHEEL_RADIUS,23), true);
+		rightMotor.rotate(convertDistance(WHEEL_RADIUS,23), false);
+		//turn right by x degrees to face "forward"
+		turnBy(70);
+		//call avoidAlt recursively if block is within sight of US
+		if(distance<threshold){
+			avoidAlt();
+		}
+		else if(distance>threshold){
+			//go forward by set distance to get past obstacle
+			leftMotor.rotate(convertDistance(WHEEL_RADIUS,25), true);
+			rightMotor.rotate(convertDistance(WHEEL_RADIUS,25), false);
+			
+			turnBy(70);
+			leftMotor.rotate(convertDistance(WHEEL_RADIUS,23), true);
+			rightMotor.rotate(convertDistance(WHEEL_RADIUS,23), false);
+			turnBy(-70);
+		}
+	}
+	// rotate by a set angle in degrees, used for avoidAlt
+	private static void turnBy (double angle){
+		leftMotor.setSpeed(ROTATE_SPEED);
+		rightMotor.setSpeed(ROTATE_SPEED);
+		
+		leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, angle), true);
+		rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, angle), false);	
+	}
+	
+	
 	// avoidance method taken from P-Controller
 	private static void avoidance(int distError) {
 		int diff = calcProp(distError);	
@@ -142,9 +210,6 @@ public class Navigation extends Thread {
 		
 		leftMotor.rotate((int) ((180.0 * 25) / (Math.PI * WHEEL_RADIUS)), true);
 		rightMotor.rotate((int) ((180.0 * 25) / (Math.PI * WHEEL_RADIUS)), false);
-		
-		
-
 	}
 
 	private static int calcProp(int diff) { // from slides
@@ -157,7 +222,6 @@ public class Navigation extends Thread {
 			correction = 100; // updated to ensure quicker turning for large
 								// anomaly values.
 		return correction;
-
 	}
 
 	// used to correct orientation

@@ -36,7 +36,6 @@ public class Lab3 {
 		int buttonChoice;
 
 		// instantiate resources
-
 		final TextLCD textLCD = LocalEV3.get().getTextLCD();
 		odometer = new Odometer(leftMotor, rightMotor, WHEEL_RADIUS, TRACK);
 		OdometryDisplay display = new OdometryDisplay(odometer, textLCD);
@@ -66,10 +65,11 @@ public class Lab3 {
 		else { //pathTwo
 			navigation = new Navigation(odometer, leftMotor, rightMotor, pathTwo, TRACK, WHEEL_RADIUS, true);
 			usPoller = new UltrasonicPoller(usDistance, usData, navigation);
+			usPoller.start();
 		}
 		
 		navigation.start();
-		usPoller.start();
+		
 		
 
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);

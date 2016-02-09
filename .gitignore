@@ -1,2 +1,6 @@
 *.class
+<<<<<<< HEAD
 *.zip
+=======
+/bin/
+>>>>>>> 6f2a666e314a75cced26cc8d5e5cb0267f1a4f87
