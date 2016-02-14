@@ -114,7 +114,7 @@ public class Navigation {
 	}
 	
 	/*
-	 * Go foward a set distance in cm
+	 * Go forward a set distance in cm
 	 */
 	public void goForward(double distance) {
 		this.travelTo(Math.cos(Math.toRadians(this.odometer.getAng())) * distance, Math.cos(Math.toRadians(this.odometer.getAng())) * distance);

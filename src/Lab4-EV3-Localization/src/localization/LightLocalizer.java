@@ -13,7 +13,7 @@ public class LightLocalizer {
 		this.colorData = colorData;
 	}
 	
-	public void doLocalization() {
+	public void doLocalization(Navigation nav) {
 		// drive to location listed in tutorial
 		// start rotating and clock all 4 gridlines
 		// do trig to compute (0,0) and 0 degrees

@@ -2,10 +2,12 @@ package localization;
 
 import lejos.hardware.*;
 import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.lcd.TextLCD;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.hardware.sensor.*;
 import lejos.robotics.SampleProvider;
+
 
 public class Lab4 {
 
@@ -41,17 +43,52 @@ public class Lab4 {
 		SampleProvider colorValue = colorSensor.getMode("Red");			// colorValue provides samples from this instance
 		float[] colorData = new float[colorValue.sampleSize()];			// colorData is the buffer in which data are returned
 				
-		// setup the odometer and display
+		// setup the odometer
 		Odometer odo = new Odometer(leftMotor, rightMotor, 30, true);
+		
+		// setup the navigator
+		Navigation nav = new Navigation(odo);
+		
+		// Initial type of localization to use
+		USLocalizer.LocalizationType locType = USLocalizer.LocalizationType.FALLING_EDGE;
+		
+		int buttonChoice;
+		final TextLCD textLCD = LocalEV3.get().getTextLCD();
+		
+		do {
+			// clear the display
+			textLCD.clear();
+
+			// ask the user whether the robot should localize with Falling Edge or Rising Edge
+			textLCD.drawString("< Left | Right >", 0, 0);
+			textLCD.drawString("       |        ", 0, 1);
+			textLCD.drawString("Falling| Rising ", 0, 2);
+			textLCD.drawString("Edge   | Edge   ", 0, 3);
+
+			buttonChoice = Button.waitForAnyPress();
+		} while (buttonChoice != Button.ID_LEFT && buttonChoice != Button.ID_RIGHT);
+		
+		
+		if(buttonChoice == Button.ID_LEFT){
+			// perform the ultrasonic localization with Falling Edge
+			locType = USLocalizer.LocalizationType.FALLING_EDGE;
+		}
+		else{
+			// perform the ultrasonic localization with Rising Edge
+			locType = USLocalizer.LocalizationType.RISING_EDGE;
+		}
+		
+		// display the odometer which was set up previously
+		textLCD.clear();
 		LCDInfo lcd = new LCDInfo(odo);
 		
 		// perform the ultrasonic localization
-		USLocalizer usl = new USLocalizer(odo, usValue, usData, USLocalizer.LocalizationType.FALLING_EDGE);
-		usl.doLocalization();
+		USLocalizer usl = new USLocalizer(odo, usValue, usData, locType);
+		usl.doLocalization(nav);
 		
 		// perform the light sensor localization
 		LightLocalizer lsl = new LightLocalizer(odo, colorValue, colorData);
-		lsl.doLocalization();			
+		lsl.doLocalization(nav);			
 		
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);	
