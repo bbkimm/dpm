@@ -26,7 +26,7 @@ public class USLocalizer {
 	
 	public void doLocalization(Navigation nav) {
 		double [] pos = new double [3];
-		double angleA, angleB;
+		double angleA, angleB, thetaD;
 		
 		if (locType == LocalizationType.FALLING_EDGE) {
 			// rotate the robot until it sees no wall
@@ -68,12 +68,22 @@ public class USLocalizer {
 			
 			// angleA is clockwise from angleB, so assume the average of the
 			// angles to the right of angleB is 45 degrees past 'north'
-			
-			// TODO
+
+			if(angleA > angleB){
+				thetaD = 225 - (angleA + angleB)/2;
+			}
+			else{
+				thetaD = 45 - (angleA + angleB)/2;
+			}
 			
 			// update the odometer position (example to follow:)
-			// TODO
-			odo.setPosition(new double [] {0.0, 0.0, 0.0}, new boolean [] {true, true, true});
+			// Updates odometer's orientation, but not x-y coordinates
+			double newTheta = this.odo.getAng() + thetaD;
+			this.odo.setPosition(new double [] {0.0, 0.0, newTheta}, new boolean [] {false, false, true});
+			
+			// Turn to 0 degrees
+			nav.setSpeeds(ROTATION_SPEED, ROTATION_SPEED);
+			nav.turnTo(0, true);
 		} 
 		
 		else {
@@ -124,11 +134,21 @@ public class USLocalizer {
 			// angleA is clockwise from angleB, so assume the average of the
 			// angles to the right of angleB is 45 degrees past 'north'
 			
-			// TODO
+			if(angleA > angleB){
+				thetaD = 225 - (angleA + angleB)/2;
+			}
+			else{
+				thetaD = 45 - (angleA + angleB)/2;
+			}
 			
 			// update the odometer position (example to follow:)
-			// TODO
-			odo.setPosition(new double [] {0.0, 0.0, 0.0}, new boolean [] {true, true, true});
+			// Updates odometer's orientation, but not x-y coordinates
+			double newTheta = this.odo.getAng() + thetaD;
+			this.odo.setPosition(new double [] {0.0, 0.0, newTheta}, new boolean [] {false, false, true});
+			
+			// Turn to 0 degrees
+			nav.setSpeeds(ROTATION_SPEED, ROTATION_SPEED);
+			nav.turnTo(0, true);
 		}
 	}
 	
