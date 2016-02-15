@@ -169,11 +169,11 @@ public class USLocalizer {
 		}
 	}
 	
-	private float getFilteredData() {
+	public float getFilteredData() {
 		usSensor.fetchSample(usData, 0);
 		float distance = usData[0];
 		
-		if(distance > 50)
+		if(distance > .50)
 			distance = 255;
 		
 		final TextLCD LCD = LocalEV3.get().getTextLCD();;
