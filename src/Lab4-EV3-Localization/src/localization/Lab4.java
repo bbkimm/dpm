@@ -87,10 +87,12 @@ public class Lab4 {
 		USLocalizer usl = new USLocalizer(odo, usValue, usData, locType);
 		usl.doLocalization(nav);
 		
+		while (Button.waitForAnyPress() != Button.ID_ENTER);
+		
 		// perform the light sensor localization
-		//LightLocalizer lsl = new LightLocalizer(odo, colorValue, colorData,
-		//		leftMotor, rightMotor, usl, nav);
-		//lsl.doLocalization();			
+		LightLocalizer lsl = new LightLocalizer(odo, colorValue, colorData,
+				leftMotor, rightMotor, usl, nav);
+		lsl.doLocalization();			
 		
 		while (Button.waitForAnyPress() != Button.ID_ESCAPE);
 		System.exit(0);	

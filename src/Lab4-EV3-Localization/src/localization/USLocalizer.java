@@ -177,7 +177,7 @@ public class USLocalizer {
 			distance = 255;
 		
 		final TextLCD LCD = LocalEV3.get().getTextLCD();;
-		LCD.drawString("US: "+distance, 0, 4);
+		LCD.drawString("US: "+ distance, 0, 4);
 		
 		return distance;
 	}

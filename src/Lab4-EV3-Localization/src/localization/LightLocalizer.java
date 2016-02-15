@@ -3,6 +3,7 @@ package localization;
 import lejos.hardware.Sound;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.robotics.SampleProvider;
+import lejos.utility.Delay;
 
 public class LightLocalizer {
 	private static final int FWDSPEED = 110; 
@@ -28,12 +29,47 @@ public class LightLocalizer {
 		this.colorData = colorData;
 		this.leftMotor = leftMotor;
 		this.rightMotor = rightMotor;
+		this.usLocalizer = usLocalizer;
 		this.nav = nav;
 		
 	}
 	
 	public void doLocalization() {
 		// drive to location listed in tutorial
+		boolean detected = false;
+		leftMotor.setSpeed(FWDSPEED);
+		rightMotor.setSpeed(FWDSPEED);
+		
+		while(!detected) {
+			colorSensor.fetchSample(colorData, 0); //get sample continuously
+			leftMotor.forward(); //start moving
+			rightMotor.forward();
+			if(colorData[0] == 13){ //if cross a black line
+				Delay.msDelay(500); //go forward slightly longer
+				detected = true;
+				leftMotor.stop();
+				rightMotor.stop();
+			}
+		}
+		detected = false;
+		
+		nav.turnBy(-90); //turn by 90
+		
+		while(!detected) {
+			colorSensor.fetchSample(colorData, 0); //get sample continuously
+			leftMotor.forward(); //start moving
+			rightMotor.forward();
+			if(colorData[0] == 13){ //if cross a black line
+				Delay.msDelay(500); //go forward slightly longer
+				detected = true;
+				leftMotor.stop();
+				rightMotor.stop();
+			}
+		}
+		//should be intersection
+		
+		
+		
 		// start rotating and clock all 4 gridlines
 		// do trig to compute (0,0) and 0 degrees
 		// when done travel to (0,0) and turn to 0 degrees
