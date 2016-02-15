@@ -10,10 +10,12 @@ package localization;
  * 
  * Movement control class (turnTo, travelTo, flt, localize)
  */
+import lejos.hardware.ev3.LocalEV3;
+import lejos.hardware.motor.EV3MediumRegulatedMotor;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 
 public class Navigation {
-	final static int FAST = 200, SLOW = 100, ACCELERATION = 4000;
+	final static int FAST = 200, SLOW = 100, ACCELERATION = 2000;
 	final static double DEG_ERR = 3.0, CM_ERR = 1.0;
 	private Odometer odometer;
 	private EV3LargeRegulatedMotor leftMotor, rightMotor;
@@ -58,7 +60,13 @@ public class Navigation {
 		else
 			this.rightMotor.forward();
 	}
-
+	
+	// Set Motor Speed
+	public void setMotorSpeeds(int lSpd, int rSpd){
+		this.leftMotor.setSpeed(lSpd);
+		this.rightMotor.setSpeed(rSpd);
+	}
+	
 	/*
 	 * Float the two motors jointly
 	 */
@@ -111,6 +119,20 @@ public class Navigation {
 		if (stop) {
 			this.setSpeeds(0, 0);
 		}
+	}
+	public void turnBy (double angle){
+		leftMotor.setSpeed(50);
+		rightMotor.setSpeed(50);
+				
+		leftMotor.rotate(convertAngle(2.1, 15.8, angle), true);
+		rightMotor.rotate(-convertAngle(2.1, 15.8, angle), false);	
+	}
+	private static int convertAngle(double radius, double width, double angle) {
+		// fixed to work in radians instead of degrees
+		return convertDistance(radius, Math.PI * width * angle / 360.0);
+	}
+	private static int convertDistance(double radius, double distance) {
+		return (int) ((180.0 * distance) / (Math.PI * radius));
 	}
 	
 	/*

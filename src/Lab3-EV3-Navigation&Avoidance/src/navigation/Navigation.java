@@ -2,6 +2,8 @@
  * Group 51
  * Brian Kim-Lim (260636766)
  * Jason Dias (260617554)
+ * 
+ * Lab 3 - Navigation
  */
 
 package navigation;
@@ -106,8 +108,8 @@ public class Navigation extends Thread {
 						// make sharp left turn
 						leftMotor.setSpeed(ROTATE_SPEED);
 						rightMotor.setSpeed(ROTATE_SPEED);
-						leftMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(70)), true);
-						rightMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(70)), false);
+						leftMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(75)), true);
+						rightMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(75)), false);
 						// use P controller
 						avoidance((int) (threshold - distance));
 						break; // break out to recalculate
@@ -159,8 +161,8 @@ public class Navigation extends Thread {
 		leftMotor.rotate((int) ((180.0 * 15) / (Math.PI * WHEEL_RADIUS)), true);
 		rightMotor.rotate((int) ((180.0 * 15) / (Math.PI * WHEEL_RADIUS)), false);
 		// block has been passed
-		leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(88)), true);
-		rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(88)), false);
+		leftMotor.rotate(convertAngle(WHEEL_RADIUS, TRACK, Math.abs(85)), true);
+		rightMotor.rotate(-convertAngle(WHEEL_RADIUS, TRACK, Math.abs(85)), false);
 		
 		while (distance <= 18) {
 			leftMotor.forward();
