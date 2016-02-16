@@ -40,34 +40,6 @@ public class LightLocalizer {
 		leftMotor.setSpeed(FWDSPEED);
 		rightMotor.setSpeed(FWDSPEED);
 		
-		while(!detected) {
-			colorSensor.fetchSample(colorData, 0); //get sample continuously
-			leftMotor.forward(); //start moving
-			rightMotor.forward();
-			if(colorData[0] == 13){ //if cross a black line
-				Delay.msDelay(500); //go forward slightly longer
-				detected = true;
-				leftMotor.stop();
-				rightMotor.stop();
-			}
-		}
-		detected = false;
-		
-		nav.turnBy(-90); //turn by 90
-		
-		while(!detected) {
-			colorSensor.fetchSample(colorData, 0); //get sample continuously
-			leftMotor.forward(); //start moving
-			rightMotor.forward();
-			if(colorData[0] == 13){ //if cross a black line
-				Delay.msDelay(500); //go forward slightly longer
-				detected = true;
-				leftMotor.stop();
-				rightMotor.stop();
-			}
-		}
-		//should be intersection
-		
 		
 		
 		// start rotating and clock all 4 gridlines
@@ -155,8 +127,8 @@ public class LightLocalizer {
 
 		
 		//compute new angles
-		double xTheta = (collectedData[3][2] * 180/Math.PI) - (collectedData[1][2] * 180/Math.PI); //4th - 2nd
-		double yTheta = (collectedData[2][2] * 180/Math.PI) - (collectedData[0][2] * 180/Math.PI); // 3rd - 1st
+		double xTheta = (collectedData[3][2] * Math.PI/180) - (collectedData[1][2] * Math.PI/180); //4th - 2nd
+		double yTheta = (collectedData[2][2] * Math.PI/180) - (collectedData[0][2] * Math.PI/180); // 3rd - 1st
 		
 		//compute new distance
 		double distance = 7.3; //TODO: MEASURE DISTANCE FROM CENTER AXEL TO LIGHT SENSOR AT THE BACK
@@ -164,7 +136,7 @@ public class LightLocalizer {
 		double y = distance * Math.cos(xTheta/2);
 		
 		yTheta = yTheta * 180 / Math.PI;
-		double thetaOffset = 90 - (collectedData[0][2] * 180/Math.PI) + yTheta/2;
+		double thetaOffset = 90 - (collectedData[0][2] * 180/Math.PI  - 180) + yTheta/2;
 		
 		
 		//update the odometer
