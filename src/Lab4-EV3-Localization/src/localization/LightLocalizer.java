@@ -7,7 +7,7 @@ import lejos.utility.Delay;
 
 public class LightLocalizer {
 	private static final int FWDSPEED = 110; 
-	private static final int ROTATION_SPEED = 30;
+	private static final int ROTATION_SPEED = 70;
 	private static final long CORRECTION_PERIOD = 5;
 
 	
@@ -59,8 +59,8 @@ public class LightLocalizer {
 		
 		//calculate and set new distances
 		//determine position in 1x1 block
-		xDist = 100*xDist - 30;
-		yDist = 100*yDist - 30;
+		xDist = 100*xDist - 25;
+		yDist = 100*yDist - 25;
 		odo.setPosition(new double[]{xDist, yDist}, new boolean[]{true,true,false});
 		
 		
@@ -92,7 +92,9 @@ public class LightLocalizer {
 			if(colorData[0] == 13.0) {
 				Sound.beep();
 				storeData(count++);
-				
+				if(count < 4) {
+				Delay.msDelay(2000);
+				}
 			}
 
 			// this ensure the odometry correction occurs only once every period
@@ -131,7 +133,7 @@ public class LightLocalizer {
 		double yTheta = (collectedData[2][2] * Math.PI/180) - (collectedData[0][2] * Math.PI/180); // 3rd - 1st
 		
 		//compute new distance
-		double distance = 7.0; //TODO: MEASURE DISTANCE FROM CENTER AXEL TO LIGHT SENSOR AT THE BACK
+		double distance = 7.3; //TODO: MEASURE DISTANCE FROM CENTER AXEL TO LIGHT SENSOR AT THE BACK
 		double x = distance * Math.cos(yTheta/2);
 		double y = distance * Math.cos(xTheta/2);
 		
@@ -140,7 +142,7 @@ public class LightLocalizer {
 		
 		
 		//update the odometer
-		double[] updatedPos = new double[]{x,y, odo.getAng() + thetaOffset + 20};
+		double[] updatedPos = new double[]{x,y, odo.getAng() + thetaOffset};
 		odo.setPosition(updatedPos, new boolean[]{true,true,true});
 		
 		
