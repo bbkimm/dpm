@@ -93,7 +93,9 @@ public class LightLocalizer {
 			if(colorData[0] == 13.0) {
 				Sound.beep();
 				storeData(count++);
+				if(count < 4) {
 				Delay.msDelay(2000);
+				}
 				
 			}
 			
@@ -111,7 +113,6 @@ public class LightLocalizer {
 		
 		nav.travelTo(0, 0);
 		nav.turnTo(0,true);
-		
 		leftMotor.stop();
 		rightMotor.stop();
 	}
@@ -125,7 +126,7 @@ public class LightLocalizer {
 		double yTheta = (collectedData[2][2] * Math.PI/180) - (collectedData[0][2] * Math.PI/180); // 3rd - 1st
 		
 		//compute new distance
-		double distance = 7.2; //TODO: MEASURE DISTANCE FROM CENTER AXEL TO LIGHT SENSOR AT THE BACK
+		double distance = 7; //TODO: MEASURE DISTANCE FROM CENTER AXEL TO LIGHT SENSOR AT THE BACK
 		double x = distance * Math.cos(yTheta/2);
 		double y = distance * Math.cos(xTheta/2);
 		
@@ -134,8 +135,9 @@ public class LightLocalizer {
 		
 		
 		//update the odometer
-		double[] updatedPos = new double[]{x,y, odo.getAng() + thetaOffset};
+		double[] updatedPos = new double[]{x,y, odo.getAng() + thetaOffset + 10};
 		odo.setPosition(updatedPos, new boolean[]{true,true,true});
+		
 		
 		
 	}
