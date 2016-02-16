@@ -10,7 +10,7 @@ import lejos.utility.Delay;
 
 public class LightLocalizer {
 	private static final int FWDSPEED = 110; 
-	private static final int ROTATION_SPEED = 30;
+	private static final int ROTATION_SPEED = 70;
 	private static final long CORRECTION_PERIOD = 5;
 
 	
@@ -42,7 +42,7 @@ public class LightLocalizer {
 		boolean detected = false;
 		leftMotor.setSpeed(FWDSPEED);
 		rightMotor.setSpeed(FWDSPEED);
-		
+	
 		
 		// start rotating and clock all 4 gridlines
 		// do trig to compute (0,0) and 0 degrees
@@ -96,8 +96,8 @@ public class LightLocalizer {
 				if(count < 4) {
 				Delay.msDelay(2000);
 				}
-				
 			}
+
 			
 				
 			
@@ -122,20 +122,20 @@ public class LightLocalizer {
 		
 		//compute new angles
 		Sound.beepSequenceUp();
+
 		double xTheta = (collectedData[3][2] * Math.PI/180) - (collectedData[1][2] * Math.PI/180); //4th - 2nd
 		double yTheta = (collectedData[2][2] * Math.PI/180) - (collectedData[0][2] * Math.PI/180); // 3rd - 1st
 		
 		//compute new distance
-		double distance = 7; //TODO: MEASURE DISTANCE FROM CENTER AXEL TO LIGHT SENSOR AT THE BACK
+		double distance = 7.2	; // DISTANCE FROM CENTER AXEL TO LIGHT SENSOR AT THE BACK
 		double x = distance * Math.cos(yTheta/2);
 		double y = distance * Math.cos(xTheta/2);
 		
 		yTheta = yTheta * 180 / Math.PI;
-		double thetaOffset = 90 - (collectedData[0][2]* Math.PI/180 - 180) + yTheta/2;
 		
 		
 		//update the odometer
-		double[] updatedPos = new double[]{x,y, odo.getAng() + thetaOffset + 10};
+		double[] updatedPos = new double[]{x,y, odo.getAng()};
 		odo.setPosition(updatedPos, new boolean[]{true,true,true});
 		
 		
