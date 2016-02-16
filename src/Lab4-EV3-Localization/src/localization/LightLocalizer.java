@@ -133,16 +133,15 @@ public class LightLocalizer {
 		double yTheta = (collectedData[2][2] * Math.PI/180) - (collectedData[0][2] * Math.PI/180); // 3rd - 1st
 		
 		//compute new distance
-		double distance = 7.3; //TODO: MEASURE DISTANCE FROM CENTER AXEL TO LIGHT SENSOR AT THE BACK
+		double distance = 7.2	; // DISTANCE FROM CENTER AXEL TO LIGHT SENSOR AT THE BACK
 		double x = distance * Math.cos(yTheta/2);
 		double y = distance * Math.cos(xTheta/2);
 		
 		yTheta = yTheta * 180 / Math.PI;
-		double thetaOffset = 90 - (collectedData[0][2] * 180/Math.PI  - 180) + yTheta/2;
 		
 		
 		//update the odometer
-		double[] updatedPos = new double[]{x,y, odo.getAng() + thetaOffset};
+		double[] updatedPos = new double[]{x,y, odo.getAng()};
 		odo.setPosition(updatedPos, new boolean[]{true,true,true});
 		
 		
