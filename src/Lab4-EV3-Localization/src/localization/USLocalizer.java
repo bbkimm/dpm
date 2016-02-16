@@ -59,7 +59,6 @@ public class USLocalizer {
 			
 			// switch direction and wait until it sees no wall
 			while(getFilteredData() < (THRESHOLD + THRESH_ERR)){
-				nav.setSpeeds(ROTATION_SPEED, -ROTATION_SPEED);
 			}
 			Delay.msDelay(1000);
 			nav.turnBy(15);
