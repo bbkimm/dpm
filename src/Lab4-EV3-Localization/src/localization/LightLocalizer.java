@@ -9,6 +9,8 @@ public class LightLocalizer {
 	private static final int FWDSPEED = 110; 
 	private static final int ROTATION_SPEED = 30;
 	private static final long CORRECTION_PERIOD = 5;
+	
+	private static final double CEN_TO_LIGHT = 8;
 
 	
 	private Odometer odo;
@@ -35,6 +37,48 @@ public class LightLocalizer {
 	}
 	
 	public void doLocalization() {
+		
+		leftMotor.setSpeed(ROTATION_SPEED);
+		rightMotor.setSpeed(ROTATION_SPEED);
+		nav.turnTo(45, true);
+		Delay.msDelay(1000);
+		leftMotor.setSpeed(FWDSPEED);
+		rightMotor.setSpeed(FWDSPEED);
+		nav.goForward(15.5);
+		Delay.msDelay(500);
+		nav.setSpeeds(0, 0);
+		
+		
+		int gridNumber = 0;
+		double[] fourAngles = new double[4];
+		boolean finished = false;
+		
+		while(gridNumber<4){
+			colorSensor.fetchSample(colorData, 0); //get sample continuously
+			nav.setMotorSpeeds(70, -70);
+			if(colorData[0] == 13){
+				
+				fourAngles[gridNumber] = this.odo.getAng();
+				gridNumber++;
+				Sound.beep();
+				try {Thread.sleep(2000);} catch (InterruptedException e) {}
+			}
+		}
+		
+		double thetaX = Math.abs(fourAngles[0] - fourAngles[2]);
+		double thetaY = Math.abs(fourAngles[1] - fourAngles[3]);
+		
+		double xOffset = -(CEN_TO_LIGHT)*Math.cos(thetaY/2); 
+		double yOffset = -(CEN_TO_LIGHT)*Math.cos(thetaX/2);
+		
+		odo.setPosition(new double[]{-xOffset, -yOffset,0}, new boolean[] {true,true,false});
+		nav.travelTo(0, 0);
+		Delay.msDelay(1000);
+		nav.setMotorSpeeds(ROTATION_SPEED, ROTATION_SPEED);
+		nav.turnTo(0, true);
+	}
+}
+		/*
 		// drive to location listed in tutorial
 		boolean detected = false;
 		leftMotor.setSpeed(FWDSPEED);
@@ -45,7 +89,8 @@ public class LightLocalizer {
 			leftMotor.forward(); //start moving
 			rightMotor.forward();
 			if(colorData[0] == 13){ //if cross a black line
-				Delay.msDelay(500); //go forward slightly longer
+				//Delay.msDelay(500); //go forward slightly longer
+				nav.goForward(5);
 				detected = true;
 				leftMotor.stop();
 				rightMotor.stop();
@@ -60,7 +105,8 @@ public class LightLocalizer {
 			leftMotor.forward(); //start moving
 			rightMotor.forward();
 			if(colorData[0] == 13){ //if cross a black line
-				Delay.msDelay(500); //go forward slightly longer
+				//Delay.msDelay(500); //go forward slightly longer
+				nav.goForward(5);
 				detected = true;
 				leftMotor.stop();
 				rightMotor.stop();
@@ -75,15 +121,17 @@ public class LightLocalizer {
 		// when done travel to (0,0) and turn to 0 degrees
 		
 		//determine distance from the wall
+		nav.turnTo(180, true); //turn to and stop
+		leftMotor.stop();
+		rightMotor.stop();
+		double xDist = usLocalizer.getFilteredData(); //get xDistance
+		
 		nav.turnTo(270, true); //turn to and stop
 		leftMotor.stop();
 		rightMotor.stop();
 		double yDist = usLocalizer.getFilteredData(); //get yDistance
 		
-		nav.turnTo(180, true); //turn to and stop
-		leftMotor.stop();
-		rightMotor.stop();
-		double xDist = usLocalizer.getFilteredData(); //get xDistance
+		
 		
 		//calculate and set new distances
 		//determine position in 1x1 block
@@ -181,4 +229,4 @@ public class LightLocalizer {
 		
 	}
 
-}
+}*/

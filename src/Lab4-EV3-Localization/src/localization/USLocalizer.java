@@ -93,7 +93,7 @@ public class USLocalizer {
 			this.odo.setPosition(new double [] {0.0, 0.0, newTheta}, new boolean [] {false, false, true});
 			
 			// Turn to 0 degrees
-			nav.setMotorSpeeds(100, 100);
+			nav.setMotorSpeeds(70, 70);
 			nav.turnTo(0, true);
 		} 
 		
@@ -164,7 +164,7 @@ public class USLocalizer {
 			this.odo.setPosition(new double [] {0.0, 0.0, newTheta}, new boolean [] {false, false, true});
 			
 			// Turn to 0 degrees
-			nav.setMotorSpeeds(100, 100);
+			nav.setMotorSpeeds(70, 70);
 			nav.turnTo(0, true);
 		}
 	}
@@ -176,8 +176,8 @@ public class USLocalizer {
 		if(distance > .50)
 			distance = 255;
 		
-		final TextLCD LCD = LocalEV3.get().getTextLCD();;
-		LCD.drawString("US: "+ distance, 0, 4);
+		/*final TextLCD LCD = LocalEV3.get().getTextLCD();;
+		LCD.drawString("US: "+ distance, 0, 4);*/
 		
 		return distance;
 	}
