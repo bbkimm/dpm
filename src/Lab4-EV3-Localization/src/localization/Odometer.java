@@ -26,7 +26,11 @@ package localization;
  * 					270Deg:neg y-axis
  * 
  * The odometer is initalized to 90 degrees, assuming the robot is facing up the positive y-axis
- * 
+ * // Lab4.java
+
+ // Group 51
+ // Brian Kim - Lim 260636766
+ // Jason Dias 260617554
  */
 
 import lejos.utility.Timer;
