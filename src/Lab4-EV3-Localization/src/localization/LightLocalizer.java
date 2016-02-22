@@ -1,3 +1,9 @@
+// Lab4.java
+
+ // Group 51
+ // Brian Kim - Lim 260636766
+ // Jason Dias 260617554
+
 package localization;
 
 import lejos.ev3.tools.EV3Console;
@@ -13,7 +19,7 @@ public class LightLocalizer {
 	private static final int ROTATION_SPEED = 70;
 	private static final long CORRECTION_PERIOD = 5;
 
-	
+	//Resources
 	private Odometer odo;
 	private SampleProvider colorSensor;
 	private EV3LargeRegulatedMotor leftMotor;
@@ -22,7 +28,9 @@ public class LightLocalizer {
 	private Navigation nav;
 	private float[] colorData;	
 	
+	//for data collection (x,y,angle)
 	private double[][] collectedData = new double[4][3];
+	
 	
 	public LightLocalizer(Odometer odo, SampleProvider colorSensor, float[] colorData,
 			EV3LargeRegulatedMotor leftMotor, EV3LargeRegulatedMotor rightMotor, 
@@ -86,14 +94,13 @@ public class LightLocalizer {
 		int count = 0;
 		while (count < 4) {
 			
-
 			colorSensor.fetchSample(colorData, 0);
 			
 			//line detected at 13
 			if(colorData[0] == 13.0) {
 				Sound.beep();
 				storeData(count++);
-				if(count < 4) {
+				if(count < 4) { //ensure that last line is not overshot
 				Delay.msDelay(2000);
 				}
 			}
@@ -135,8 +142,8 @@ public class LightLocalizer {
 		
 		
 		//update the odometer
-		double[] updatedPos = new double[]{x,y, odo.getAng()};
-		odo.setPosition(updatedPos, new boolean[]{true,true,true});
+		double[] updatedPos = new double[]{x,y, 0};
+		odo.setPosition(updatedPos, new boolean[]{true,true,false});
 		
 		
 		

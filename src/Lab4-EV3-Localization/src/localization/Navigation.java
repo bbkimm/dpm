@@ -1,5 +1,10 @@
-package localization;
+// Lab4.java
 
+ // Group 51
+ // Brian Kim - Lim 260636766
+ // Jason Dias 260617554
+
+package localization;
 
  /* File: Navigation.java
  * Written by: Sean Lawlor

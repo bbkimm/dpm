@@ -5,6 +5,10 @@ import lejos.hardware.ev3.LocalEV3;
 import lejos.hardware.motor.EV3LargeRegulatedMotor;
 import lejos.hardware.port.Port;
 import lejos.robotics.SampleProvider;
+import wallFollower.BangBangController;
+import wallFollower.PController;
+import wallFollower.Printer;
+import wallFollower.UltrasonicPoller;
 import lejos.hardware.Button;
 
 //
