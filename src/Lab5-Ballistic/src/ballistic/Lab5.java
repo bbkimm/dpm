@@ -29,14 +29,15 @@ public class Lab5 {
 			
 			Button.waitForAnyPress(); // wait for button to release
 			
-			//High speed and acceleration is needed to have enough power to launch the ball at ~120cm away from
-			//the objective tile
+			//High speed and acceleration are needed to have enough power to launch the ball at ~120cm away 
+			//from the objective tile
 			launchMotorOne.setSpeed(5500);
 			launchMotorOne.setAcceleration(100000);
 			launchMotorTwo.setSpeed(5500);
 			launchMotorTwo.setAcceleration(100000);
 			
-			//From our starting angle position, rotate 80 degrees to reach roughly the optimal launch angle
+			//From our starting angle position, rotate 80 degrees to reach roughly the optimal launch angle.
+			//True and false values ensure that motors are synchronous
 			launchMotorOne.rotate(-80,true);
 			launchMotorTwo.rotate(-80,false);
 			
